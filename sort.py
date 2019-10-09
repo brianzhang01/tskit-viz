@@ -16,10 +16,6 @@ def helper(tree, node):
         return node, [node]
     if len(children) != 2:
         print("That's very interesting, node " + str(node) + " has " + len(children) + " children")
-    # children_return_values = []
-    # for child in children:
-    #     a, b = helper(tree, child)
-    #     children_return_values.append([a, b])
     # List comprehension for elegance
     children_return_values = [helper(tree, child) for child in children]
     children_return_values.sort()
