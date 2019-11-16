@@ -8,6 +8,8 @@ import msprime
 ts = msprime.simulate(sample_size=10, length=1e6, random_seed=1,
     mutation_rate=1e-8, recombination_rate=1e-6)
 
+# ts.dump('example.trees')
+
 print(ts.draw_text())
 
 def helper(tree, node):
