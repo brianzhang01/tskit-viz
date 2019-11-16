@@ -1,6 +1,4 @@
-"""msprime with lexicographic sort?
-
-TODO: generalize to non-binary trees
+"""msprime with lexicographic sort
 """
 import msprime
 
@@ -24,7 +22,7 @@ def helper(tree, node):
     # print(children_return_values)
     min_lexi = []
     for element in children_return_values:
-        min_lexi += element[1]
+        min_lexi.extend(element[1])
     return children_return_values[0][0], min_lexi
 
 def lexi(tree):
