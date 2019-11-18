@@ -17,8 +17,10 @@ breakpoints = list(ts.breakpoints())
 variants = list(ts.variants())
 trees = ts.aslist()
 max_height = max([tree.time(tree.root) for tree in trees])
-print(max_height)
+print("Max height:", max_height)
+print("Genome length:", ts.sequence_length)
 # print(ts.draw_text())
+# print(pygame.font.get_fonts())
 ready_for_press = True
 
 pygame.init()
@@ -32,6 +34,7 @@ tree_index = 0 # starting tree index
 tree_width = 700
 tree_canvas_height = height-genome_height-2*margin
 tree_height = tree_canvas_height - margin
+font_space = 20
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((width, height))
@@ -40,6 +43,7 @@ genome_offset = ((0, height-genome_height))
 tree_canvas = pygame.Surface((tree_width, tree_canvas_height), 0)
 tree_offset = ((width - tree_width) // 2, margin)
 
+pygame.display.set_caption('tskit TreeSequence visualization') 
 running = True
 first_pass = True
 while running:
@@ -61,8 +65,8 @@ while running:
             if tree_index >= len(breakpoints) - 1:
                 tree_index = len(breakpoints) - 2
         if not ready_for_press or first_pass:
-            print("Region ", tree_index, ", [", breakpoints[tree_index], ", ",
-                  breakpoints[tree_index+1], ")", sep="")
+            # print("Region ", tree_index, ", [", breakpoints[tree_index], ", ",
+            #       breakpoints[tree_index+1], ")", sep="")
             for v in variants:
                 if breakpoints[tree_index] <= v.position and v.position < breakpoints[tree_index + 1]:
                     print("Genotypes ", v.genotypes.tolist(), " from mutation at ", v.position, sep="")
@@ -70,10 +74,13 @@ while running:
             node_y_dict = {}
             node_parent_dict = {}
             tree = trees[tree_index]
-            samples = minlex(tree)
+            if True:  # Toggle me!
+                samples = minlex(tree)
+            else:
+                samples = list(tree.samples())
             n = len(samples)
             for i, sample in enumerate(samples):
-                node_x_dict[sample] = int(i / (n - 1) * tree_width)
+                node_x_dict[sample] = int(i / (n - 1) * (tree_width - 1))
                 node_y_dict[sample] = 0
 
             def fill_tree_positions(tree, node):
@@ -173,7 +180,7 @@ while running:
             ypos = node_y_dict[node]
             parent_xpos = node_x_dict[node_parent_dict[node]]
             parent_ypos = node_y_dict[node_parent_dict[node]]
-            edgeline = xpos == 0 or xpos == tree_width
+            edgeline = xpos == 0 or xpos == tree_width - 1
             special_width = edgelinewidth if edgeline else linewidth
             # vertical line
             pygame.draw.line(
@@ -189,7 +196,31 @@ while running:
                 (xpos, tree_canvas_height - parent_ypos),
                 (parent_xpos, tree_canvas_height - parent_ypos),
                 linewidth)
+    for v in tree.mutations():
+        xpos = node_x_dict[v.node]
+        ypos = (node_y_dict[v.node] + node_y_dict[node_parent_dict[v.node]]) // 2
+        cross_size = margin // 6
+        pygame.draw.line(
+            tree_canvas,
+            BLACK,
+            (xpos - cross_size, tree_canvas_height - (ypos - cross_size)),
+            (xpos + cross_size, tree_canvas_height - (ypos + cross_size)),
+            linewidth)
+        pygame.draw.line(
+            tree_canvas,
+            BLACK,
+            (xpos - cross_size, tree_canvas_height - (ypos + cross_size)),
+            (xpos + cross_size, tree_canvas_height - (ypos - cross_size)),
+            linewidth)
     screen.blit(tree_canvas, tree_offset)
+
+    font = pygame.font.SysFont('arial', 20)
+    for sample in samples:
+        text = font.render(str(sample), True, BLACK)
+        textRect = text.get_rect()
+        textRect.center = ((width - tree_width) // 2 + node_x_dict[sample], margin + tree_canvas_height + font_space)
+        screen.blit(text, textRect)
+
     pygame.display.flip()
     # time.sleep(0.1)
     clock.tick(60)
