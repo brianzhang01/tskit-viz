@@ -2,14 +2,6 @@
 """
 import msprime
 
-# Great parameters! Save them
-ts = msprime.simulate(sample_size=10, length=1e6, random_seed=1,
-    mutation_rate=1e-8, recombination_rate=1e-6)
-
-# ts.dump('example.trees')
-
-print(ts.draw_text())
-
 def helper(tree, node):
     children = tree.children(node)
     if len(children) == 0:
@@ -25,11 +17,23 @@ def helper(tree, node):
         min_lexi.extend(element[1])
     return children_return_values[0][0], min_lexi
 
-def lexi(tree):
+def minlex(tree):
     """Given a tree, return a list of samples producing this tree that has
     minimum lexicographic order.
     """
     return helper(tree, tree.root)[1]
 
-for tree in ts.trees():
-    print(lexi(tree))
+if __name__ == "__main__":
+    # Great parameters! Save them
+    ts = msprime.simulate(sample_size=10, length=1e6, random_seed=1,
+        mutation_rate=1e-8, recombination_rate=1e-6)
+    # ts.dump('example.trees')
+
+    # ts = msprime.simulate(sample_size=20, length=1e8, random_seed=1,
+    #     mutation_rate=1.65e-8, recombination_rate=1.2e-8)
+    # ts.dump('example20.trees')
+
+    print(ts.draw_text())
+
+    for tree in ts.trees():
+        print(minlex(tree))
