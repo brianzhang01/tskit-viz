@@ -11,8 +11,22 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-# ts = tskit.load('example.trees')
-ts = tskit.load('example20.trees')
+if False:
+    # ts = tskit.load('example.trees')
+    ts = tskit.load('example20.trees')
+else:
+    import msprime
+    import random
+    seed = random.randint(1, 1000) # inclusive
+    sample_size=50
+    print("Your seed is", seed)
+    ts = msprime.simulate(sample_size=sample_size, length=1e8, random_seed=seed,
+        mutation_rate=1.65e-8, recombination_rate=1.2e-8)
+if ts.num_samples < 30:
+    fontsize=20
+else:
+    fontsize=10
+
 breakpoints = list(ts.breakpoints())
 variants = list(ts.variants())
 trees = ts.aslist()
@@ -214,7 +228,7 @@ while running:
             linewidth)
     screen.blit(tree_canvas, tree_offset)
 
-    font = pygame.font.SysFont('arial', 20)
+    font = pygame.font.SysFont('arial', fontsize)
     for sample in samples:
         text = font.render(str(sample), True, BLACK)
         textRect = text.get_rect()
