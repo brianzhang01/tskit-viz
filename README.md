@@ -2,7 +2,9 @@
 
 Trying out a visualization idea for `tskit.TreeSequence`
 
-## Summary
+![Demo video](static/tskit-viz-demo.mp4)
+
+## Earlier proposal
 
 Given N samples, there are N! ways to order them. Given a local tree for these samples, there are 2^(N-1) ways to order the samples left-to-right such that the resulting tree can be drawn in the canonical way without intersections.
 
