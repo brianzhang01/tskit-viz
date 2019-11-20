@@ -2,7 +2,7 @@
 
 Trying out a visualization idea for `tskit.TreeSequence`
 
-![Demo video](static/tskit-viz-demo.mp4?raw=true)
+![Demo video](static/tskit-viz-demo.gif)
 
 ## Earlier proposal
 

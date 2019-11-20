@@ -1,1 +1,3 @@
 static/tskit-viz-demo.mp4 filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text
+static/tskit-viz-demo.gif filter=lfs diff=lfs merge=lfs -text
