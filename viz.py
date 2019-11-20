@@ -1,7 +1,11 @@
+"""tskit TreeSequence visualization
+"""
+
+import argparse
 import tskit
 import pygame
-from pygame.locals import *
-import time
+from pygame.locals import *  # TODO: change to selective import
+# import time
 from sort import minlex
 
 # TODO: change this to an Enum
@@ -11,21 +15,48 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-if False:
-    # ts = tskit.load('example.trees')
-    ts = tskit.load('example20.trees')
+parser = argparse.ArgumentParser(description='Visualize tskit TreeSequence\'s.')
+parser.add_argument("--file", help="Path to .trees file (default None)",
+    action="store", default=None)
+parser.add_argument("--num_samples", help="Number of samples to simulate (default 20)",
+    action="store", default=20, type=int)
+parser.add_argument("--length", help="Simulation length (default 3e3)",
+    action="store", default=3e3, type=float)
+parser.add_argument("--seed", help="Random seed (default None)",
+    action="store", default=None, type=int)
+parser.add_argument("--sort", help="Whether to sort samples using minlex (1=True, 0=False, default 1)",
+    action="store", default=1, type=int)
+parser.add_argument("--fontsize", help="Font size for labels (default None, dynamically chosen)",
+    action="store", default=None, type=int)
+args = parser.parse_args()
+
+print("Command-line args:")
+args_to_print = vars(args)
+for k in sorted(args_to_print):
+    print(k + ": " + str(args_to_print[k]))
+
+sort_samples = (args.sort != 0)
+
+if args.file is not None:
+    ts = tskit.load(args.file)
 else:
     import msprime
-    import random
-    seed = random.randint(1, 1000) # inclusive
-    sample_size=50
+    if args.seed is None:
+        import random
+        seed = random.randint(1, 1000) # inclusive
+    else:
+        seed = args.seed
+        # seed = 227
     print("Your seed is", seed)
-    ts = msprime.simulate(sample_size=sample_size, length=1e8, random_seed=seed,
-        mutation_rate=1.65e-8, recombination_rate=1.2e-8)
-if ts.num_samples < 30:
-    fontsize=20
+    ts = msprime.simulate(sample_size=args.num_samples, length=args.length, random_seed=seed,
+        mutation_rate=1.65e-8, recombination_rate=1.2e-8, Ne=20000)
+if args.fontsize is None:
+    if ts.num_samples < 30:
+        fontsize=20
+    else:
+        fontsize=10
 else:
-    fontsize=10
+    fontsize = args.fontsize
 
 breakpoints = list(ts.breakpoints())
 variants = list(ts.variants())
@@ -33,6 +64,7 @@ trees = ts.aslist()
 max_height = max([tree.time(tree.root) for tree in trees])
 print("Max height:", max_height)
 print("Genome length:", ts.sequence_length)
+print("Navigate with the left / right arrow keys")
 # print(ts.draw_text())
 # print(pygame.font.get_fonts())
 ready_for_press = True
@@ -88,7 +120,7 @@ while running:
             node_y_dict = {}
             node_parent_dict = {}
             tree = trees[tree_index]
-            if True:  # Toggle me!
+            if sort_samples:  # Toggle me!
                 samples = minlex(tree)
             else:
                 samples = list(tree.samples())
