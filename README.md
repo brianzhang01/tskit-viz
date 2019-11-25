@@ -1,4 +1,8 @@
-# tskit-viz
+# THIS REPOSITORY IS DEPRECATED
+
+Files have been moved to be part of the https://github.com/tskit-dev/tsviz/ project instead. Please do not develop here.
+
+## tskit-viz
 
 Trying out a visualization idea for `tskit.TreeSequence`
 
